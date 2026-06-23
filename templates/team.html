@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title%}Team Builder - Pokémon Team Builder{% endblock %}
+
+{% block content %}
+<h2>Team Builder</h2>
+<p class="muted">Logged in as {{ session.get('user_email') }}!</p>
+
+<p>Use Pokésearch to look for Pokémon and build teams of up to 6.</p>
+
+<!-- Scaffold for Pokémon search input box and results-->
+<section class="card">
+    <h3>Pokésearch</h3>
+
+    <form id="search-form" class="form-row">
+        <input id="pokemon-input" type="text" placeholder="e.g. shuckle, pineco" autocomplete="off" required>
+        <button type="submit">Search</button>
+    </form>
+
+    <div id="search-status" class="status" aria-live="polite"></div>
+
+    <div id="search-result" class="pokemon-result"></div>
+</section>
+
+<!-- Scaffold for Your Team list-->
+<section class="card">
+    <h3> Your Team (max 6)</h3>
+
+    <div class="form-row" style="margin-bottom: 10px;">
+        <input id="team-name" type="text" placeholder="Team name (e.g Elite Four Run, Yuba River)">
+        <button id="save-team-btn" type="button">Save Team</button>
+    </div>
+
+    <div id="save-status" class="status" aria-live="polite"></div>
+
+    <div id="team-grid" class="team-grid"></div>
+</section>
+
+
+<script src="{{  url_for('static', filename='team.js') }}"></script>
+{% endblock %}

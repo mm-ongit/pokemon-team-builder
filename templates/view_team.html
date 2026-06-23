@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Team - Pokémon Team Builder{% endblock %}
+
+{% block content %}
+<h2>{{ team['name'] }}</h2>
+<p class="muted">Created: {{ team['date_created'] }}</p>
+
+<div class="card">
+    {% for p in pokemon %}
+    <div class="team-slot" style="margin-bottom: 10px;">
+        <img src="{{ p['sprite_url'] or '' }}" alt="{{ p['pokemon_name'] }}">
+        <div>
+            <div class="pokemon-name">{{ p['pokemon_name'] }}</div>
+            <div class="muted">{{ p['types'] }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

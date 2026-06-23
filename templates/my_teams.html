@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}My Teams - Pokémon Team Builder{% endblock %}
+
+{% block content %}
+<h2>My Teams</h2>
+
+{% if teams|length == 0 %}
+<p class="muted">No saved teams yet.</p>
+{% else %}
+<div class="card">
+    <ul>
+        {% for team in teams %}
+        <li>
+            <a href="{{ url_for('view_team', team_id=team['id']) }}">{{ team['name'] }}</a>
+            <span class="muted"> — {{ team['date_created'] }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+{% endblock %}

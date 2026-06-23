@@ -1,0 +1,148 @@
+body {
+    font-family: system-ui, -apple-system, BlinkMacSysemFont, sans-serif;
+    margin: 0;
+    padding: 16px;
+    background-color: #18de78;
+}
+
+h1 {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+}
+
+p {
+    font-size: 1rem;
+    color: #333
+}
+
+.container {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.site-title {
+    margin: 0 0 8px 0;
+    font-size: 1.4rem;
+}
+
+.nav a {
+    margin-right: 12px;
+    text-decoration: none;
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.nav a:hover {
+    text-decoration: underline;
+}
+
+.form {
+    display: grid;
+    gap: 10px;
+    background: white;
+    padding: 16px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+}
+
+input {
+    padding: 10px;
+    font-size: 1rem;
+}
+
+button {
+    padding: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.flash {
+    background: #fff3cd;
+    border: 1px solid #ffeeba;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+}
+
+.muted {
+    color: #555
+}
+
+.card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.status {
+    margin-top: 10px;
+    min-height: 1.2em;
+}
+
+.pokemon-result {
+    margin-top: 12px;
+}
+
+.pokemon-card {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    gap: 12px;
+    align-items: center;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.pokemon-card img {
+    width: 72px;
+    height: 72px;
+}
+
+.pokemon-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: capitalize;
+    margin: 0;
+}
+
+.pokemon-types {
+    margin: 6px 0 0 0;
+    color: #444
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+.team-slot {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 10px;
+}
+
+.team-slot img {
+    width: 56px;
+    height: 56px;
+}
+
+/* single column on mobile but two columns on desktop */
+@media (min-width: 480px) {
+    .team-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}

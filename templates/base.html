@@ -1,0 +1,54 @@
+<!-- Master page layout upon which other pages will be based through Jinja template inheritance -->
+<!-- Think of it as the frame of the website. All other pages plug content into it-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- this makes the page scale correctly on iPhone -->
+    <meta name="viewport" cotent="width=device-width, initial-scale=1.0">
+    <!-- this determines what text is displayed on the browser tab-->
+    <title> {% block title %}Pokémon Team Builder{% endblock %}</title>
+    <!-- Links the CSS file, tells flask to generate the correct url-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container">
+            <h1 class="site-title">Pokémon Team Builder</h1>
+
+            <!-- Adds items to the navigation menu-->
+            <nav class="nav">
+                <a href="{{ url_for('home') }}">Home</a>
+
+                <!-- Uses Flask's session object (available in templates) to show different links depending on login state -->
+                {% if session.get('user_id') %}
+                <a href="{{ url_for('team') }}">Team Builder</a>
+                <a href="{{ url_for('my_teams')}}">My Teams</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+                {% else %}
+                <a href="{{ url_for('register') }}">Register</a>
+                <a href="{{ url_for('login') }}">Login</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- This block uses Jinja to show flashed messages -->
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="flash">
+            {% for message in messages %}
+            <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        <!-- This line is Jinja to allow other pages to insert content-->
+        {% block content %}{% endblock %}
+    </main>
+</body>
+
+</html>

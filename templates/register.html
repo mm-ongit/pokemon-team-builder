@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Pokémon Team Builder{% endblock %}
+
+{% block content %}
+<h2>Create an account</h2>
+
+<!-- Creates a form (text boxes) and submits info entered via HTML POST -->
+<form method="POST" action="{{ url_for('register') }}" class="form">
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" required>
+
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" required minlength="8">
+
+    <button type="submit">Create account</button>
+</form>
+
+{% endblock %}
