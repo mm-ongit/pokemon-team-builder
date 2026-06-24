@@ -116,7 +116,7 @@ def login():
             flash("Incorrect password.")
             return redirect(url_for("login"))
 
-        # Store user's id and email in the session cookie
+        # Store user's id and email in the session cookie and makes it expire with browser session
         session["user_id"] = user["id"]
         session["user_email"] = user["email"]
         session.permanent = False
