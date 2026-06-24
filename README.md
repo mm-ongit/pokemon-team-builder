@@ -2,7 +2,7 @@
 Web app that allows users to create, name, and store teams of up to six Pokemon.
 
 To-Do's📋:
-- [x6/24/25] update session behavior so login does not persist beyond browser session
+- [x] update session behavior so login does not persist beyond browser session (6/24/25)
 - [ ] update private key management
 - [ ] verify user email exists
 - [ ] send user email to confirm account
