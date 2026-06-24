@@ -119,6 +119,7 @@ def login():
         # Store user's id and email in the session cookie
         session["user_id"] = user["id"]
         session["user_email"] = user["email"]
+        session.permanent = False
 
         flash("Logged in successfully.")
         return redirect(url_for("team"))
