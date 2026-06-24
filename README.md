@@ -8,7 +8,7 @@ To-Do's📋:
 - improve search UX with autocomplete and type search
 - show more Pokémon details like stats and abilities
 - prevent duplicate team names
-- add locatiion data to teams
+- add location data to teams
 - add other teams near present location path
 - improve mobile-first UI
 - refactor the Flask structure into cleaner modules
