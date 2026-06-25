@@ -11,6 +11,7 @@ __pycache__/
 instance/
 
 # Local database files
+database/app.db
 *.db
 *.sqlite
 *.sqlite3
