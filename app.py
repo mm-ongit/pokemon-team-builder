@@ -36,8 +36,8 @@ def init_db():
                  user_id INTEGER NOT NULL,
                  name TEXT NOT NULL,
                  date_created TEXT NOT NULL DEFAULT (datetime('now')),
-                 FOREIGN KEY (user_id) REFERENCES users (id)),
-                 UNIQUE(user_id, name));
+                 FOREIGN KEY (user_id) REFERENCES users (id));
+                 UNIQUE (user_id, name);
                  """)
     conn.execute("""CREATE TABLE IF NOT EXISTS team_pokemon (
                  id INTEGER PRIMARY KEY AUTOINCREMENT,
