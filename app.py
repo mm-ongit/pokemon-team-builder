@@ -37,6 +37,7 @@ def init_db():
                  name TEXT NOT NULL,
                  date_created TEXT NOT NULL DEFAULT (datetime('now')),
                  FOREIGN KEY (user_id) REFERENCES users (id));
+                 UNIQUE (user_id, name);
                  """)
     conn.execute("""CREATE TABLE IF NOT EXISTS team_pokemon (
                  id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -208,25 +209,28 @@ def api_save_team():
 
     conn = get_db_connection()
     cur = conn.cursor()
-
-    cur.execute(
-        "INSERT INTO teams (user_id, name) VALUES (?, ?)", (
-            session["user_id"], name)
-    )
-    team_id = cur.lastrowid
-
-    for slot, p in enumerate(pokemon, start=1):
-        types_str = ", ".join(p["types"])
+    try:
         cur.execute(
-            """
-            INSERT INTO team_pokemon (team_id, slot, pokemon_id, pokemon_name, sprite_url, types)
-            VALUES (?, ?, ?, ?, ?, ?)
-            """, (team_id, slot, p["id"], p["name"], p.get("sprite"), types_str)
+            "INSERT INTO teams (user_id, name) VALUES (?, ?)", (
+                session["user_id"], name)
         )
+        team_id = cur.lastrowid
 
-    conn.commit()
+        for slot, p in enumerate(pokemon, start=1):
+            types_str = ", ".join(p["types"])
+            cur.execute(
+                """
+                INSERT INTO team_pokemon (team_id, slot, pokemon_id, pokemon_name, sprite_url, types)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """, (team_id, slot, p["id"], p["name"], p.get("sprite"), types_str)
+            )
+
+        conn.commit()
+    except sqlite3.IntegrityError:
+        conn.close()
+        return jsonify({"error": "You already have a team with that name."}), 400
+
     conn.close()
-
     return jsonify({"ok": True, "team_id": team_id})
 
 
