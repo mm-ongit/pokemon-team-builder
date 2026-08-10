@@ -9,7 +9,7 @@ To-Do's📋:
 - [ ] load saved teams back into the builder for editing
 - [ ] improve search UX with autocomplete and type search
 - [ ] show more Pokémon details like stats and abilities
-- [ ] prevent duplicate team names
+- [x] prevent duplicate team names (8/9/2026)
 - [ ] add location data to teams
 - [ ] add other teams near present location path
 - [ ] improve mobile-first UI
