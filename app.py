@@ -209,6 +209,22 @@ def api_save_team():
     conn = get_db_connection()
     cur = conn.cursor()
 
+    existing = cur.execute(
+        """
+        SELECT id
+        FROM teams
+        WHERE user_id = ?
+        AND LOWER(name) = LOWER(?)
+        """,
+        (session["user_id"], name),
+    ).fetchone()
+
+    if existing:
+        conn.close()
+        return jsonify({
+            "error": f'You already have a team named "{name}".'
+        }), 400
+
     cur.execute(
         "INSERT INTO teams (user_id, name) VALUES (?, ?)", (
             session["user_id"], name)
