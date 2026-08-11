@@ -36,7 +36,8 @@ def init_db():
                  user_id INTEGER NOT NULL,
                  name TEXT NOT NULL,
                  date_created TEXT NOT NULL DEFAULT (datetime('now')),
-                 FOREIGN KEY (user_id) REFERENCES users (id));
+                 FOREIGN KEY (user_id) REFERENCES users (id),
+                 UNIQUE(user_id, name));
                  """)
     conn.execute("""CREATE TABLE IF NOT EXISTS team_pokemon (
                  id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -191,7 +192,7 @@ def api_save_team():
         return jsonify({"error": "Unauthorized"}), 401
 
     payload = request.get_json(silent=True) or {}
-    name = (payload.get("name") or {}).strip()
+    name = (payload.get("name") or "").strip()
     pokemon = payload.get("pokemon") or []
 
     if not name:
@@ -286,6 +287,51 @@ def view_team(team_id):
     conn.close
 
     return render_template("view_team.html", team=team_row, pokemon=pokemon_rows)
+
+# Logic to delete saved teams
+
+
+@app.route("/teams/<int:team_id>/delete", methods=["POST"])
+def delete_teams(team_id):
+    if not session.get("user_id"):
+        flash("Please log in to delete teams.")
+        return redirect(url_for("login"))
+
+    conn = get_db_connection()
+
+    # Does the team exist?
+    # Does it belog to the logged in user?
+    team = conn.execute(
+        """
+        SELECT id
+        FROM teams
+        WHERE id = ? AND user_id = ?
+        """,
+        (team_id, session["user_id"]),
+    ).fetchone()
+
+    if team is None:
+        conn.close()
+        flash("Team not found.")
+        return redirect(url_for("my_teams"))
+
+    # Removes pokemon from team
+    conn.execute(
+        "DELETE FROM team_pokemon WHERE team_id = ?",
+        (team_id,),
+    )
+
+    # Deletes the team itself
+    conn.execute(
+        "DELETE FROM teams WHERE id = ?",
+        (team_id,),
+    )
+
+    conn.commit()
+    conn.close()
+
+    flash("Team deleted.")
+    return redirect(url_for("my_teams"))
 
 
 # Initialiize database, auto-restart app when code is changed, and initiate web server at 127.0.0.1 using port 5001 and a mobile server at 0.0.0.0 using port 5001

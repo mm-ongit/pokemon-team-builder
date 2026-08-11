@@ -13,6 +13,10 @@
         <li>
             <a href="{{ url_for('view_team', team_id=team['id']) }}">{{ team['name'] }}</a>
             <span class="muted"> — {{ team['date_created'] }}</span>
+            <form method="POST" action="{{ url_for('delete_teams', team_id=team['id']) }}" style="display: inline;"
+                onsubmit="return confirm('Delete this team?')">
+                <button type="submit">Delete</button>
+            </form>
         </li>
         {% endfor %}
     </ul>
