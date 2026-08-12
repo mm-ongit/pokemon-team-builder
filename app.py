@@ -210,7 +210,7 @@ def api_save_team():
     conn = get_db_connection()
     cur = conn.cursor()
 
-    existing = cur.execute(
+    duplicate = cur.execute(
         """
         SELECT id
         FROM teams
@@ -220,7 +220,7 @@ def api_save_team():
         (session["user_id"], name),
     ).fetchone()
 
-    if existing:
+    if duplicate:
         conn.close()
         return jsonify({
             "error": f'You already have a team named "{name}".'
@@ -246,6 +246,107 @@ def api_save_team():
 
     return jsonify({"ok": True, "team_id": team_id})
 
+# Updates teams already saved in the database
+
+
+@app.route("/api/teams/<int:team_id>", methods=["PUT"])
+def api_update_team(team_id):
+
+    if not session.get("user_id"):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    payload = request.get_json(silent=True) or {}
+    name = (payload.get("name") or "").strip()
+    pokemon = payload.get("pokemon") or []
+
+    if not name:
+        return jsonify({"error": "Team name is required"}), 400
+    if not isinstance(pokemon, list) or len(pokemon) == 0:
+        return jsonify({"error": "Add at least 1 Pokémon"}), 400
+    if len(pokemon) > 6:
+        return jsonify({"error": "Team cannot exceed 6 Pokémon"}), 400
+
+    required_keys = {"id", "name", "sprite", "types"}
+    for i, p in enumerate(pokemon, start=1):
+        if not isinstance(p, dict) or not required_keys.issubset(p.keys()):
+            return jsonify({"error": f"Invalid Pokémon data at slot {i}"}), 400
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    # Verify team belongs to currently logged in user
+    team_row = cur.execute(
+        """
+        SELECT id
+        FROM teams
+        WHERE id = ? AND user_id = ?
+        """,
+        (team_id, session["user_id"]),
+    ).fetchone()
+
+    if team_row is None:
+        conn.close()
+        flash({"error": "Team not found"}), 404
+
+    # Check if other teams besides this one are duplicates
+    duplicate = cur.execute(
+        """
+        SELECT id
+        FROM teams
+        WHERE user_id = ? AND LOWER(name) = LOWER(?) AND id != ?
+        """,
+        (session["user_id"], name, team_id),
+    ).fetchone()
+
+    if duplicate:
+        conn.close()
+        return jsonify({
+            "error": f'You already have a team named "{name}".'
+        }), 400
+
+    # Update the team's name
+    cur.execute(
+        """
+        UPDATE teams
+        SET name = ?
+        WHERE id = ?
+        """,
+        (name, team_id),
+    )
+
+    # Replace old Pokemon rows with edited team
+    cur.execute(
+        "DELETE FROM team_pokemon WHERE team_id = ?",
+        (team_id,),
+    )
+
+    for slot, p in enumerate(pokemon, start=1):
+        types_str = ", ".join(p["types"])
+
+        cur.execute(
+            """
+            INSERT INTO team_pokemon (
+                team_id,
+                slot,
+                pokemon_id,
+                pokemon_name,
+                sprite_url,
+                types)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+            (team_id, slot, p["id"], p["name"], p.get("sprite"), types_str,),
+        )
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        "ok": True,
+        "team_id": team_id
+    })
+
+# Logic to view list of saved teams
+
 
 @app.route("/my-teams")
 def my_teams():
@@ -261,6 +362,8 @@ def my_teams():
     conn.close()
 
     return render_template("my_teams.html", teams=teams)
+
+# Logic to view a saved team
 
 
 @app.route("/teams/<int:team_id>")
@@ -332,6 +435,62 @@ def delete_teams(team_id):
 
     flash("Team deleted.")
     return redirect(url_for("my_teams"))
+
+
+@app.route("/teams/<int:team_id>/edit")
+def edit_team(team_id):
+    if not session.get("user_id"):
+        flash("Please log in to edit teams.")
+        return redirect(url_for("login"))
+
+    conn = get_db_connection()
+
+    # Does the team exist?
+    # Does it belog to the logged in user?
+    team_row = conn.execute(
+        """
+        SELECT *
+        FROM teams
+        WHERE id = ? AND user_id = ?
+        """,
+        (team_id, session["user_id"])
+    ).fetchone()
+
+    if team_row is None:
+        conn.close()
+        flash("Team not found.")
+        return redirect(url_for("my_teams"))
+
+    # Loads the team
+    pokemon_rows = conn.execute(
+        """
+        SELECT *
+        FROM team_pokemon
+        WHERE team_id= ?
+        ORDER BY slot ASC
+        """,
+        (team_id,),
+    ).fetchall()
+
+    conn.close()
+
+    # Loads each pokemon on the team
+    pokemon = [
+        {
+            "id": p["pokemon_id"],
+            "name": p["pokemon_name"],
+            "sprite": p["sprite_url"],
+            "types": [t.strip() for t in p["types"].split(",")]
+        }
+        for p in pokemon_rows
+    ]
+
+    # Displays team reusing team.html template
+    return render_template(
+        "team.html",
+        edit_team=team_row,
+        initial_pokemon=pokemon,
+    )
 
 
 # Initialiize database, auto-restart app when code is changed, and initiate web server at 127.0.0.1 using port 5001 and a mobile server at 0.0.0.0 using port 5001

@@ -27,7 +27,8 @@
     <h3> Your Team (max 6)</h3>
 
     <div class="form-row" style="margin-bottom: 10px;">
-        <input id="team-name" type="text" placeholder="Team name (e.g Elite Four Run, Yuba River)">
+        <input id="team-name" type="text" placeholder="Team name (e.g Elite Four Run, Yuba River)"
+            value="{{ edit_team['name'] if edit_team else ''}}">
         <button id="save-team-btn" type="button">Save Team</button>
     </div>
 
@@ -36,6 +37,11 @@
     <div id="team-grid" class="team-grid"></div>
 </section>
 
+<input id="edit-team-id" type="hidden" value="{{ edit_team['id'] if edit_team else '' }}">
+
+<script>
+    window.initialPokemon = {{ initial_pokemon | default ([]) | tojson }};
+</script>
 
 <script src="{{  url_for('static', filename='team.js') }}"></script>
 {% endblock %}

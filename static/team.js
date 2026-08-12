@@ -8,6 +8,7 @@ const teamGrid = document.getElementById("team-grid");
 const teamNameInput = document.getElementById("team-name");
 const saveBtn = document.getElementById("save-team-btn");
 const saveStatusEl = document.getElementById("save-status");
+const editTeamId = document.getElementById("edit-team-id").value;
 
 function setSaveStatus(msg) {
     saveStatusEl.textContent = msg || "";
@@ -17,7 +18,7 @@ function setSaveStatus(msg) {
 console.log({ form, input, statusEl, resultEl, teamGrid });
 
 let currentPokemon = null; // Create a Pokemon object
-let team = []; // Array of Pokemon objects
+let team = window.initialPokemon || []; // Empty or populated array of Pokemon objects
 
 function setStatus(msg) {
     statusEl.textContent = msg || "";
@@ -122,9 +123,17 @@ async function saveTeam() {
 
     setSaveStatus("Saving...");
 
+    const url = editTeamId
+        ? `/api/teams/${editTeamId}`
+        : "/api/teams";
+
+    const method = editTeamId
+        ? "PUT"
+        : "POST";
+
     try {
-        const resp = await fetch("/api/teams", {
-            method: "POST",
+        const resp = await fetch(url, {
+            method: method,
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name, pokemon: team }),
         });
